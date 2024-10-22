@@ -13,20 +13,29 @@ use Illuminate\Support\Facades\Redirect;
 class UserServiceProvider extends ServiceProvider
 {
  
-    public static function registerUser(array $incomingFields): RedirectResponse 
+    public static function registerUser(array $incomingFields, Request $request): bool
     {
         
-        //if($incomingFields->hasFile('image')) {$path = $incomingFields->file('image')->store('images','public');}
-
-        if($incomingFields['name'] == '') {
-            return redirect('/');
+        if($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('images','public');
+        $incomingFields['image'] = $imagePath;
         }
 
         $incomingFields['password'] = bcrypt($incomingFields['password']);
-        $user = User::create($incomingFields);
-        Auth::login($user);
 
-        return redirect('/movies');
+        try {
+
+            $user = User::create($incomingFields);
+            $token = $user->createToken('API Token')->plainTextToken;
+
+            return response()->json(['token' => $token], 201);
+
+            Auth::login($user);
+            
+
+        } catch(\Exception $e) {
+            return false . $e;
+        }
         
     }
    

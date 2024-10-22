@@ -1,0 +1,10 @@
+### Testing the User Registration API
+
+POST http://localhost:8000/
+Content-Type: multipart/form-data
+
+# Form Data
+image=@/path/to/your/image.jpg
+name=John Doe
+email=johndoe@example.com
+password=supersecurepassword
